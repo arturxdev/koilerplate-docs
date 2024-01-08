@@ -1,0 +1,9 @@
+{
+  "index": "Estructura",
+  "config": "Config",
+  "entities": "Entidades",
+  "repositories": "Repositorios",
+  "services": "Servicios",
+  "routes": "Rutas",
+  "app": "App"
+}

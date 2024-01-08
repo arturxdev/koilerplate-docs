@@ -1,0 +1,14 @@
+{
+  "index": {
+    "type": "page",
+    "title": "Koilerplate",
+    "display": "hidden",
+    "theme": {
+      "layout": "raw"
+    }
+  },
+  "docs": {
+    "type": "page",
+    "title": "Documentation"
+  }
+}

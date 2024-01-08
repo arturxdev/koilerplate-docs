@@ -1,0 +1,42 @@
+### Entities
+
+En esta carpeta estaran solo las entidades que son parte de la logica de negocio, por ejemplo usuario, producto, etc.
+
+Una entidad de algun repositorio, por ejemplo alguna que se necesite en el repositorio no podra vivir aca
+
+Para la declaracion de esta entidad utilizaremos [zod](/docs/plugin#zod)
+
+```typescript
+import { z } from "zod";
+
+export const USER_ROLES = ["cashier", "viewer", "admin"] as const;
+
+//User
+export const UserSchema = z.object({
+  id: z.string(),
+  name: z.string({ required_error: "name requerido" }),
+  lastName: z.string({ required_error: "lastName requerido" }),
+  email: z.string({ required_error: "email requerido" }).email(),
+  role: z
+    .enum(USER_ROLES, { required_error: "role requerido" })
+    .default("viewer"),
+});
+export type User = z.infer<typeof UserSchema>;
+
+//create
+export const CreateUserSchema = UserSchema.omit({
+  id: true,
+  isDeleted: true,
+});
+
+export type CreateUser = z.infer<typeof CreateUserSchema>;
+
+// update
+export const UpdateUserSchema = UserSchema.extend({
+  id: z.string({ required_error: "id requerido" }),
+});
+
+export type UpdateUser = z.infer<typeof UpdateUserSchema>;
+```
+Como podemos ver zod nos deja crear un schema de la entidad y luego podemos crear sub schemas los cuales nos serviran para crear o actulizar un registro, aparte zod tiene la habilidad de poder generarnos tipos y asi mantentener todo en un solo lugar
+

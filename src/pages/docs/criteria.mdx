@@ -1,0 +1,75 @@
+# Criteria Pattern
+
+## Descripción
+
+Una de las acciones más comunes que vamos a necesitar hacer sobre nuestro listado de agregados tambien conocidos como entidades es la aplicación de distintos filtros.
+Estos filtros nos van a permitir obtener una lista reducida de estas entidades según el criterio o los criterios que hayamos elegido.
+
+Para hacer este filtrado nos apoyamos en el **patrón Criteria/Specification**, que precisamente es un patrón orientado a poder filtrar colecciones bajo distintos criterios, permitiendo además encadenarlos para conformar filtros más complejos. Y lo más importante, este patrón no está acoplado a ninguna infraestructura o base de datos específica.
+
+Al incluir este patron en tu repositorio cada entidad va ha poder ser filtrada dependiendo de las propiedas y su tipo de dato, para esto deberas contruir un criterio teniendo encuenta la entidad
+y las siguientes reglas:
+
+- para una entidad sencilla como : 
+    ```typeScript
+    type entity =
+    {
+      "Name": string;
+      "LastName": string;
+      "Price": number;
+      "CreatedAt": Date;
+    }
+    
+    ```
+
+### Tabla de operadores para el filtro
+
+
+| Operador de comparación | Ejemplo  | Sintaxis |
+| --- | --- | --- |
+| String (igual) | Nombre igual a "Pedro" | ```{"'Name': 'Pedro'}``` |
+| String (contiene) | Nombre contiene "dro" | ```{"Name": { "contains-ignore-case": "dro" }}``` |
+| String ó (operador or) | Nombre es "Pedro" o es "Juan" | ```{"Name": ["Pedro", "Juan"]}``` |
+| Numérico (igual) | Precio es 100 | ```{"Price": { "numeric": 100 }}```  |
+| Numérico (rango) | Precio es mayor que 10, y menor o igual que 20 | ```{"Price": { "numeric": {">": 10, "<=": 20 } } }```|
+| Numérico ó (operador or) | Precio es 10 o 20 | ```{"Price": { "numeric": [10,20] } }``` |
+| Fecha (igual) | Fecha es "2020-09-09" | ```{"CreatedAt": { "date": "2020-09-09" }}```  |
+| Fecha (rango) | Fecha es mayor que "2020-09-01", y menor o igual que "2020-09-30" | ```{"CreatedAt": { "date": {">": "2020-09-01", "<=": "2020-09-30" } }}``` |
+| Fecha ó (operador or) | Fecha es "2020-09-09" o "2020-09-10" | ```{"CreatedAt": { "date": ["2020-09-09" ,"2020-09-10" ] }}``` |
+| And | Nombre es "Pedro" el apellido es "Pérez"  y el precio es 10 o 20 | ```{"Name": "Pedro", "LastName":"Pérez", "Price": { "numeric": [10,20] }}``` |
+| Or entre diferentes campos | Nombre es "Pedro" o apellido es Pérez o el precio es 10 o 20  | ```{$or:{"Name": "Pedro", "LastName":"Pérez", "Price": { "numeric": [10,20] }}}``` |
+
+
+Ejemplo de un filtro mas complejo 
+
+En este ejemplo se crea un criterio para buscar en la entidad cuando
+nombre es Pedro o Juan o Pablo y el CreatedAt esta entre 2020-09-01 y 2020-09-30 y (el apellido es Pérez o el precio esta entre 100 y 1000) 
+
+```json 
+{
+  "Name": ["Pedro","Juan","Pablo"], 
+  "CreatedAt": { "date": {">": "2020-09-01", "<=": "2020-09-30" } }, 
+  "$or":{"LastName":"Pérez"}, 
+  "Price": {"numeric":  {">":10, "<":1000} }}
+}
+```
+
+Ademas de todo el patron criteria nos permite recibir un parametro sort el cual ordena los registros con los parametros enviados con la siguiente sintaxis :
+
+
+### Tabla de operadores para el ordenamiento
+
+
+| Operador de ordenamiento | Ejemplo | Sintaxis |
+| --- | --- | --- |
+| Ascendentemente | Precio ordenado Ascendentemente | "Price": "ASC" |
+| Descendentemente | Precio ordenado Descendentemente | "Price": "DESC" |
+
+
+Ejemplo de un ordenamiento mas complejo
+
+En este ejemplo se ordena por cantidad ASC y la fecha de creacion DESC dando prioridad a amount
+
+```json
+{"Price":**"ASC" **, "createdAt":  "DESC" }
+```

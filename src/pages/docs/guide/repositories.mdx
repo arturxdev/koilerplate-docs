@@ -1,0 +1,71 @@
+import { Callout } from 'nextra/components'
+
+# Repositories
+
+Los repositorios son las conexiones a las bases de datos, estos se encargan de hacer las consultas y retornar los datos a los servicios, por ejemplo los reositorios pueden ser bases de datos o modulos de build de koibanx
+
+Para esto tenemos dos tipos de repositorios: los que van directo a una base de datos como mongo y los repositorios que obtienen la informacion de algo como una api o un archivo
+
+#### Repositorio a base de datos
+Este repositorio solo necesita dos archivos, el schema de mongo y el repositorio. el schema se vera de la sigueinte manera
+
+user.schema.ts
+
+Es el lugar donde estara declarado el schema de mongose
+
+```typescript  filename="user.schema.ts"
+import { User } from "entities/user.entity";
+import { Document, model, Schema } from "mongoose";
+
+export interface UserDocument extends User, Document {
+  id: string;
+}
+
+export const userSchema = new Schema<UserDocument>(
+  {
+    name: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+    email: {
+      type: String,
+    },
+    role: {
+      type: String,
+    },
+  },
+  { timestamps: {} },
+);
+
+export const UserModel = model<UserDocument>("user", userSchema);
+
+export const UserParser = ({
+  _doc: { _id, __v, ...restDataUser },
+}: any): User => ({
+  ...restDataUser,
+  id: _id.toString(),
+});
+
+```
+user.repository.ts
+
+Es el lugar donde esta declarado las funciones y utilidades del repositorio
+
+<Callout type="warning" emoji="⚠️">
+  nota que en la clase *UserRepository* estamos extendiendo de MongoDBRepository , esto es por que esta clase ya no da algunas funcionalidades por default para ya no repetir codigo
+</Callout>
+
+```typescript  filename="user.repository.ts"
+import { MongoDBRepository } from "config/mongo/model.repository";
+
+import { UserDocument } from "./user.schema";
+
+export class UserRepository extends MongoDBRepository<UserDocument> {}
+
+```
+
+#### Repositorio a Api, Archivo, etc
+
+#### incializar el repositorio
